@@ -5,7 +5,7 @@ import {
     createSpending,
     updateSpending,
     deleteSpending,
-} from "../controllers/spendingController.js";
+} from "../controllers/spending.controller.js";
 
 const router = express.Router();
 
