@@ -1,4 +1,4 @@
-# Restaurant by Cooking CORP.
+# Exo Docker
 Collaborateur(s) : **Amâra-Noah GAKOU**  
 Date de création du dossier : 07/01/2026
 
