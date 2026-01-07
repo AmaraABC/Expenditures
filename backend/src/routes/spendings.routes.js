@@ -6,8 +6,11 @@ import {
     updateSpending,
     deleteSpending,
 } from "../controllers/spending.controller.js";
+import { getAllCategories } from "../controllers/categories.controller.js";
 
 const router = express.Router();
+
+router.get("/categories", getAllCategories);
 
 router.get("/", getAllSpendings);
 router.get("/:id", getSpendingById);

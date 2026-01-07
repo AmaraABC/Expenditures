@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import SpendingsRoutes from "./routes/spendings.routes.js";
-import CategoriesRoutes from "./routes/categories.routes.js";
 
 dotenv.config();
 
@@ -14,8 +13,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(helmet());
 
-app.use("/", SpendingsRoutes);
-app.use("/", CategoriesRoutes);
+app.use("/spendings", SpendingsRoutes);
 
 app.listen(PORT, () =>
     console.log(`Serveur lancé sur le port ${PORT || 3000}`)

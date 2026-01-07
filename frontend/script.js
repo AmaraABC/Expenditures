@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:3000/";
+const API_URL = "http://localhost:3000/spendings";
+const CATEGORY_URL = "http://localhost:3000/spendings/categories";
 
 const form = document.getElementById("spendingForm");
 const tableBody = document.querySelector("#spendingTable tbody");
@@ -7,23 +8,41 @@ const categorySelect = document.getElementById("categorySelect");
 async function fetchSpendings() {
     const res = await fetch(API_URL);
     const data = await res.json();
-    tableBody.innerHTML = "";
 
+    tableBody.innerHTML = "";
     data.forEach(sp => {
         const row = document.createElement("tr");
         row.innerHTML = `
-      <td>${sp.id}</td>
-      <td>${sp.client_id}</td>
-      <td>${sp.category_id}</td>
-      <td>${sp.amount}</td>
-      <td>${sp.spending_description || ""}</td>
-      <td>${sp.spending_date}</td>
-      <td>
-        <button onclick="deleteSpending(${sp.id})">Supprimer</button>
-      </td>
-    `;
+            <td>${sp.id}</td>
+            <td>${sp.client_id}</td>
+            <td>${sp.category_id}</td>
+            <td>${sp.amount}</td>
+            <td>${sp.spending_description || ""}</td>
+            <td>${sp.spending_date}</td>
+            <td>
+              <button onclick="deleteSpending(${sp.id})">Supprimer</button>
+            </td>
+        `;
         tableBody.appendChild(row);
     });
+}
+
+async function fetchCategories() {
+    try {
+        const res = await fetch(CATEGORY_URL);
+        const categories = await res.json();
+
+        categorySelect.innerHTML = '<option value="">-- Choisir une catégorie --</option>';
+
+        categories.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat.id;
+            option.textContent = cat.name;
+            categorySelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Erreur catégories :", error);
+    }
 }
 
 form.addEventListener("submit", async (e) => {
@@ -41,28 +60,8 @@ form.addEventListener("submit", async (e) => {
 });
 
 async function deleteSpending(id) {
-    if (confirm("Voulez-vous vraiment supprimer cette dépense ?")) {
-        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-        fetchSpendings();
-    }
-}
-
-async function fetchCategories() {
-    try {
-        const res = await fetch(API_URL);
-        const categories = await res.json();
-
-        categorySelect.innerHTML = '<option value="">-- Choisir une catégorie --</option>';
-
-        categories.forEach(cat => {
-            const option = document.createElement("option");
-            option.value = cat.id;
-            option.textContent = cat.name;
-            categorySelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error("Erreur lors de la récupération des catégories :", error);
-    }
+    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    fetchSpendings();
 }
 
 fetchSpendings();
