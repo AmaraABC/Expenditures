@@ -14,8 +14,7 @@ async function fetchSpendings() {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${sp.id}</td>
-            <td>${sp.client_id}</td>
-            <td>${sp.category_id}</td>
+            <td>${sp.category_name || sp.category_id}</td>
             <td>${sp.amount}</td>
             <td>${sp.spending_description || ""}</td>
             <td>${sp.spending_date}</td>
@@ -30,14 +29,14 @@ async function fetchSpendings() {
 async function fetchCategories() {
     try {
         const res = await fetch(CATEGORY_URL);
-        const categories = await res.json();
+        const data = await res.json();
 
         categorySelect.innerHTML = '<option value="">-- Choisir une catégorie --</option>';
 
-        categories.forEach(cat => {
+        data.forEach(cat => {
             const option = document.createElement("option");
             option.value = cat.id;
-            option.textContent = cat.name;
+            option.textContent = cat.categories_name;
             categorySelect.appendChild(option);
         });
     } catch (error) {
@@ -47,16 +46,29 @@ async function fetchCategories() {
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const payload = Object.fromEntries(new FormData(form).entries());
 
-    await fetch(API_URL, {
+    const formData = Object.fromEntries(new FormData(form).entries());
+
+    const payload = {
+        category_id: Number(formData.category_id),
+        amount: Number(formData.amount),
+        spending_description: formData.spending_description || "",
+        spending_date: formData.spending_date
+    };
+
+    const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
     });
 
-    form.reset();
-    fetchSpendings();
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Erreur POST :", res.status, errorText);
+    } else {
+        form.reset();
+        fetchSpendings();
+    }
 });
 
 async function deleteSpending(id) {
