@@ -28,14 +28,13 @@ export const getSpendingById = async (req, res) => {
 
 export const createSpending = async (req, res) => {
     try {
-        const { client_id, category_id, amount, spending_description, spending_date } = req.body;
+        const { category_id, amount, spending_description, spending_date } = req.body;
 
-        if (!client_id || !category_id || !amount || !spending_date) {
+        if (!category_id || !amount || !spending_date) {
             return res.status(400).json({ message: "Champs obligatoires manquants." });
         }
 
         const newSpending = await Spending.create({
-            client_id,
             category_id,
             amount,
             spending_description,
@@ -58,9 +57,8 @@ export const updateSpending = async (req, res) => {
             return res.status(404).json({ message: "Dépense non trouvée." });
         }
 
-        const { client_id, category_id, amount, spending_description, spending_date } = req.body;
+        const { category_id, amount, spending_description, spending_date } = req.body;
 
-        if (client_id !== undefined) spending.client_id = client_id;
         if (category_id !== undefined) spending.category_id = category_id;
         if (amount !== undefined) spending.amount = amount;
         if (spending_description !== undefined) spending.spending_description = spending_description;

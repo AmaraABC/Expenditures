@@ -10,20 +10,41 @@ class Spending {
     this.created_at = created_at;
   }
 
-  static async create({ client_id, category_id, amount, spending_description, spending_date }) {
+  static async create({ category_id, amount, spending_description, spending_date }) {
     const [result] = await pool.query(
-      `INSERT INTO spendings (client_id, category_id, amount, spending_description, spending_date)
-       VALUES (?, ?, ?, ?, ?)`,
-      [client_id, category_id, amount, spending_description, spending_date]
+      `INSERT INTO spendings (category_id, amount, spending_description, spending_date)
+     VALUES (?, ?, ?, ?)`,
+      [category_id, amount, spending_description, spending_date]
     );
 
-    return new Spending({ id: result.insertId, client_id, category_id, amount, spending_description, spending_date });
+    return new Spending({
+      id: result.insertId,
+      category_id,
+      amount,
+      spending_description,
+      spending_date
+    });
   }
 
+
   static async findAll() {
-    const [rows] = await pool.query(`SELECT * FROM spendings`);
-    return rows.map(row => new Spending(row));
+    const [rows] = await pool.query(`
+    SELECT 
+      s.id,
+      s.amount,
+      s.spending_description,
+      s.spending_date,
+      s.created_at,
+      s.category_id,
+      c.categories_name AS category_name
+    FROM spendings s
+    JOIN categories c ON s.category_id = c.id
+    ORDER BY s.spending_date DESC
+  `);
+
+    return rows;
   }
+
 
   static async findById(id) {
     const [rows] = await pool.query(`SELECT * FROM spendings WHERE id = ?`, [id]);
@@ -36,9 +57,9 @@ class Spending {
 
     await pool.query(
       `UPDATE spendings
-       SET client_id = ?, category_id = ?, amount = ?, spending_description = ?, spending_date = ?
+       SET category_id = ?, amount = ?, spending_description = ?, spending_date = ?
        WHERE id = ?`,
-      [this.client_id, this.category_id, this.amount, this.spending_description, this.spending_date, this.id]
+      [this.category_id, this.amount, this.spending_description, this.spending_date, this.id]
     );
 
     return this;
