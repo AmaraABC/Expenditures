@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  MYSQL_DATABASE: expenditures
+  MYSQL_ROOT_PASSWORD: toor
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: mysql-env
+  name: env
